@@ -1,0 +1,54 @@
+<template>
+    <lightning-card title="Order Tracking">
+        <div class="slds-p-around_medium">
+
+            <lightning-input
+                label="Enter Order Record Id"
+                value={orderId}
+                onchange={handleOrderIdChange}>
+            </lightning-input>
+
+            <lightning-button
+                label="Search Order"
+                variant="brand"
+                class="slds-m-top_small"
+                onclick={handleSearch}>
+            </lightning-button>
+
+            <template if:true={orderRecord}>
+                <div class="slds-box slds-m-top_medium">
+                    <h2 class="slds-text-heading_medium">Order Details</h2>
+
+                    <p><strong>Order Number:</strong> {orderRecord.Name}</p>
+                    <p><strong>Customer:</strong> {orderRecord.Customer_Name__c}</p>
+                    <p><strong>Order Date:</strong> {orderRecord.Order_Date__c}</p>
+                    <p><strong>Status:</strong> {orderRecord.Status__c}</p>
+                    <p><strong>Total Amount:</strong> ₹{orderRecord.Total_Amount__c}</p>
+                </div>
+
+                <div class="slds-box slds-m-top_medium">
+                    <h2 class="slds-text-heading_medium">Order Items</h2>
+
+                    <template for:each={orderItems} for:item="item">
+                        <div key={item.Id} class="slds-border_bottom slds-p-around_small">
+                            <p><strong>Product:</strong> {item.Product__r.Name}</p>
+                            <p><strong>Quantity:</strong> {item.Quantity__c}</p>
+                            <p><strong>Price:</strong> ₹{item.Price__c}</p>
+                            <p><strong>Subtotal:</strong> ₹{item.Subtotal__c}</p>
+                        </div>
+                    </template>
+                </div>
+
+                <div class="slds-box slds-m-top_medium">
+                    <h2 class="slds-text-heading_medium">Status History</h2>
+
+                    <p>✅ Confirmed</p>
+                    <p>⏳ Processing</p>
+                    <p>🚚 Shipped</p>
+                    <p>📦 Delivered</p>
+                </div>
+            </template>
+
+        </div>
+    </lightning-card>
+</template>

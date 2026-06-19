@@ -1,0 +1,53 @@
+<template>
+    <lightning-card title="Shopping Cart">
+        <div class="slds-p-around_medium">
+            <template if:true={hasItems}>
+                <template for:each={cartItems} for:item="item">
+                    <div key={item.Id} class="slds-box slds-m-bottom_small">
+                        <h2 class="slds-text-heading_small">{item.Name}</h2>
+
+                        <p><strong>Code:</strong> {item.Product_Code__c}</p>
+                        <p><strong>Category:</strong> {item.Category__c}</p>
+                        <p><strong>Price:</strong> ₹{item.Price__c}</p>
+                        <p><strong>Available Qty:</strong> {item.Quantity__c}</p>
+
+                        <lightning-input
+                            type="number"
+                            label="Cart Quantity"
+                            value={item.cartQuantity}
+                            min="1"
+                            max={item.Quantity__c}
+                            data-id={item.Id}
+                            onchange={handleQuantityChange}>
+                        </lightning-input>
+
+                        <p><strong>Item Total:</strong> ₹{item.totalPrice}</p>
+
+                        <lightning-button
+                            label="Remove"
+                            variant="destructive"
+                            data-id={item.Id}
+                            onclick={handleRemove}>
+                        </lightning-button>
+                    </div>
+                </template>
+
+                <h2 class="slds-text-heading_medium slds-m-top_medium">
+                    Grand Total: ₹{grandTotal}
+                </h2>
+
+                <lightning-button
+                    label="Proceed to Checkout"
+                    variant="brand"
+                    class="slds-m-top_small"
+                    onclick={handleCheckout}>
+                </lightning-button>
+            </template>
+
+            <template if:false={hasItems}>
+                <p>Your cart is empty.</p>
+            </template>
+        </div>
+        
+    </lightning-card>
+</template>

@@ -1,0 +1,35 @@
+<template>
+    <lightning-card title="Product Catalog">
+        <div class="slds-p-around_medium">
+            <template if:true={products}>
+                <div class="slds-grid slds-wrap">
+                    <template for:each={products} for:item="product">
+                        <div key={product.Id} class="slds-col slds-size_1-of-3 slds-p-around_small">
+                            <div class="slds-box slds-box_x-small">
+                                <h2 class="slds-text-heading_small">{product.Name}</h2>
+
+                                <p><strong>Code:</strong> {product.Product_Code__c}</p>
+                                <p><strong>Category:</strong> {product.Category__c}</p>
+                                <p><strong>Description:</strong> {product.Description__c}</p>
+                                <p><strong>Price:</strong> ₹{product.Price__c}</p>
+                                <p><strong>Available Qty:</strong> {product.Quantity__c}</p>
+
+                                <lightning-button
+                                    label="Add to Cart"
+                                    variant="brand"
+                                    data-id={product.Id}
+                                    onclick={handleAddToCart}
+                                    disabled={product.isOutOfStock}>
+                                </lightning-button>
+                            </div>
+                        </div>
+                    </template>
+                </div>
+            </template>
+
+            <template if:true={error}>
+                <p class="slds-text-color_error">Error loading products.</p>
+            </template>
+        </div>
+    </lightning-card>
+</template>

@@ -1,0 +1,18 @@
+<template>
+    <lightning-card title="Inventory & Order Management">
+
+        <c-product-catalog
+            onaddtocart={handleAddToCart}>
+        </c-product-catalog>
+
+        <br/>
+
+      <c-shopping-cart
+    oncheckout={handleCheckout}>
+</c-shopping-cart>
+        <c-order-checkout>
+</c-order-checkout>
+<c-order-tracking>
+</c-order-tracking>
+    </lightning-card>
+</template>

@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ValidationRule xmlns="http://soap.sforce.com/2006/04/metadata">
+    <fullName>Show_a_low_stock_alert</fullName>
+    <active>false</active>
+    <errorConditionFormula>Stock_Quantity__c &lt; Reorder_Level__c</errorConditionFormula>
+    <errorDisplayField>Stock_Quantity__c</errorDisplayField>
+    <errorMessage>Stock Quantity is less than Reorder Level</errorMessage>
+</ValidationRule>
