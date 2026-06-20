@@ -12,9 +12,10 @@ export default class ProductCatalog extends LightningElement {
             this.products = data.map(product => {
                 return {
                     ...product,
-                    isOutOfStock: product.Quantity__c <= 0
+                    isOutOfStock: !product.Quantity__c || product.Quantity__c <= 0
                 };
             });
+
             this.error = undefined;
         } else if (error) {
             this.error = error;
@@ -24,13 +25,30 @@ export default class ProductCatalog extends LightningElement {
 
     handleAddToCart(event) {
         const productId = event.target.dataset.id;
-        const selectedProduct = this.products.find(product => product.Id === productId);
 
-        const addToCartEvent = new CustomEvent('addtocart', {
-            detail: selectedProduct
-        });
+        const selectedProduct = this.products.find(
+            product => product.Id === productId
+        );
 
-        this.dispatchEvent(addToCartEvent);
+        if (!selectedProduct) {
+            return;
+        }
+
+        const cartProduct = {
+            productId: selectedProduct.Id,
+            productName: selectedProduct.Name,
+            productCode: selectedProduct.Product_Code__c,
+            price: selectedProduct.Price__c,
+            availableQty: selectedProduct.Quantity__c,
+            quantity: 1,
+            subtotal: selectedProduct.Price__c
+        };
+
+        this.dispatchEvent(
+            new CustomEvent('addtocart', {
+                detail: cartProduct
+            })
+        );
 
         this.dispatchEvent(
             new ShowToastEvent({

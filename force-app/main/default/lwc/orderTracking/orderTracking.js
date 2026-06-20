@@ -1,4 +1,4 @@
-import { LightningElement, track } from 'lwc';
+import { LightningElement, track ,api} from 'lwc';
 import getOrderDetails from '@salesforce/apex/OrderTrackingController.getOrderDetails';
 import { ShowToastEvent } from 'lightning/platformShowToastEvent';
 
@@ -7,6 +7,11 @@ export default class OrderTracking extends LightningElement {
     orderId;
     @track orderRecord;
     @track orderItems = [];
+    @api
+setOrderId(orderId) {
+    this.orderId = orderId;
+    this.handleSearch();
+}
 
     handleOrderIdChange(event) {
         this.orderId = event.target.value;

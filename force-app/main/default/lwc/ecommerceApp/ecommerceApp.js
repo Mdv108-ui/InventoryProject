@@ -9,17 +9,21 @@ export default class EcommerceApp extends LightningElement {
             .querySelector('c-shopping-cart')
             .addItem(product);
     }
-    
-handleCheckout(event) {
 
-    const cartItems = event.detail.cartItems;
-    const grandTotal = event.detail.grandTotal;
+    handleCheckout(event) {
+        const cartItems = event.detail.cartItems;
+        const grandTotal = event.detail.grandTotal;
 
-    this.template
-        .querySelector('c-order-checkout')
-        .setCheckoutData(
-            cartItems,
-            grandTotal
-        );
-}
+        this.template
+            .querySelector('c-order-checkout')
+            .setCheckoutData(cartItems, grandTotal);
+    }
+
+    handleOrderCreated(event) {
+        const orderId = event.detail;
+
+        this.template
+            .querySelector('c-order-tracking')
+            .setOrderId(orderId);
+    }
 }

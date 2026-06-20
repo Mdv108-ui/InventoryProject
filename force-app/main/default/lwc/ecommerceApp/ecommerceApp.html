@@ -7,12 +7,20 @@
 
         <br/>
 
-      <c-shopping-cart
-    oncheckout={handleCheckout}>
-</c-shopping-cart>
-        <c-order-checkout>
-</c-order-checkout>
-<c-order-tracking>
-</c-order-tracking>
+        <c-shopping-cart
+            oncheckout={handleCheckout}>
+        </c-shopping-cart>
+
+        <br/>
+
+        <c-order-checkout
+            onordercreated={handleOrderCreated}>
+        </c-order-checkout>
+
+        <br/>
+
+        <c-order-tracking>
+        </c-order-tracking>
+
     </lightning-card>
 </template>

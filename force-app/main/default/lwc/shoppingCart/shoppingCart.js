@@ -6,50 +6,64 @@ export default class ShoppingCart extends LightningElement {
 
     @api
     addItem(product) {
-        const existingItem = this.cartItems.find(item => item.Id === product.Id);
+        const existingItem = this.cartItems.find(
+            item => item.productId === product.productId
+        );
 
         if (existingItem) {
-            if (existingItem.cartQuantity < existingItem.Quantity__c) {
-                existingItem.cartQuantity += 1;
-                existingItem.totalPrice = existingItem.cartQuantity * existingItem.Price__c;
-            } else {
-                this.showToast('Stock Limit', 'Cannot add more than available quantity.', 'warning');
-            }
+            this.cartItems = this.cartItems.map(item => {
+                if (item.productId === product.productId) {
+                    if (item.quantity >= item.availableQty) {
+                        this.showToast('Stock Limit', 'Cannot add more than available quantity.', 'warning');
+                        return item;
+                    }
+
+                    const newQuantity = item.quantity + 1;
+
+                    return {
+                        ...item,
+                        quantity: newQuantity,
+                        subtotal: newQuantity * item.price
+                    };
+                }
+
+                return item;
+            });
         } else {
             this.cartItems = [
                 ...this.cartItems,
                 {
-                    ...product,
-                    cartQuantity: 1,
-                    totalPrice: product.Price__c
+                    productId: product.productId,
+                    productName: product.productName,
+                    productCode: product.productCode,
+                    price: product.price || 0,
+                    availableQty: product.availableQty || 0,
+                    quantity: 1,
+                    subtotal: product.price || 0
                 }
             ];
         }
-
-        this.cartItems = [...this.cartItems];
     }
 
     handleQuantityChange(event) {
         const productId = event.target.dataset.id;
-        const enteredQuantity = parseInt(event.target.value, 10);
+        let enteredQuantity = parseInt(event.target.value, 10);
 
         this.cartItems = this.cartItems.map(item => {
-            if (item.Id === productId) {
-                let finalQuantity = enteredQuantity;
-
-                if (finalQuantity > item.Quantity__c) {
-                    finalQuantity = item.Quantity__c;
-                    this.showToast('Stock Limit', 'Quantity cannot exceed available stock.', 'warning');
+            if (item.productId === productId) {
+                if (isNaN(enteredQuantity) || enteredQuantity < 1) {
+                    enteredQuantity = 1;
                 }
 
-                if (finalQuantity < 1 || isNaN(finalQuantity)) {
-                    finalQuantity = 1;
+                if (enteredQuantity > item.availableQty) {
+                    enteredQuantity = item.availableQty;
+                    this.showToast('Stock Limit', 'Quantity cannot exceed available stock.', 'warning');
                 }
 
                 return {
                     ...item,
-                    cartQuantity: finalQuantity,
-                    totalPrice: finalQuantity * item.Price__c
+                    quantity: enteredQuantity,
+                    subtotal: enteredQuantity * item.price
                 };
             }
 
@@ -59,7 +73,10 @@ export default class ShoppingCart extends LightningElement {
 
     handleRemove(event) {
         const productId = event.target.dataset.id;
-        this.cartItems = this.cartItems.filter(item => item.Id !== productId);
+
+        this.cartItems = this.cartItems.filter(
+            item => item.productId !== productId
+        );
     }
 
     get hasItems() {
@@ -68,27 +85,27 @@ export default class ShoppingCart extends LightningElement {
 
     get grandTotal() {
         return this.cartItems.reduce((total, item) => {
-            return total + item.totalPrice;
+            return total + item.subtotal;
         }, 0);
     }
 
     handleCheckout() {
-        const checkoutEvent = new CustomEvent('checkout', {
-            detail: {
-                cartItems: this.cartItems,
-                grandTotal: this.grandTotal
-            }
-        });
-
-        this.dispatchEvent(checkoutEvent);
+        this.dispatchEvent(
+            new CustomEvent('checkout', {
+                detail: {
+                    cartItems: this.cartItems,
+                    grandTotal: this.grandTotal
+                }
+            })
+        );
     }
 
     showToast(title, message, variant) {
         this.dispatchEvent(
             new ShowToastEvent({
-                title: title,
-                message: message,
-                variant: variant
+                title,
+                message,
+                variant
             })
         );
     }
