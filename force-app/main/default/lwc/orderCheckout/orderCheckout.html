@@ -13,23 +13,15 @@
                 <div class="slds-m-top_medium">
 
                     <template for:each={cartItems} for:item="item">
-                        <div key={item.Id} class="slds-box slds-m-bottom_small">
+                        <div key={item.productId} class="slds-box slds-m-bottom_small">
 
-                            <p>
-                                <strong>{item.Name}</strong>
-                            </p>
+                            <p><strong>{item.productName}</strong></p>
 
-                            <p>
-                                Quantity: {item.cartQuantity}
-                            </p>
+                            <p>Quantity: {item.quantity}</p>
 
-                            <p>
-                                Price: ₹{item.Price__c}
-                            </p>
+                            <p>Price: ₹{item.price}</p>
 
-                            <p>
-                                Total: ₹{item.totalPrice}
-                            </p>
+                            <p>Total: ₹{item.subtotal}</p>
 
                         </div>
                     </template>

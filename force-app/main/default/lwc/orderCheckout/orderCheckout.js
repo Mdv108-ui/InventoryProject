@@ -35,13 +35,13 @@ export default class OrderCheckout extends LightningElement {
         }
 
         const cartPayload = this.cartItems.map(item => {
-            return {
-                id: item.Id,
-                name: item.Name,
-                price: item.Price__c,
-                cartQuantity: item.cartQuantity
-            };
-        });
+    return {
+        id: item.productId,
+        name: item.productName,
+        price: item.price,
+        cartQuantity: item.quantity
+    };
+});
 
         createOrder({
             customerName: this.customerName,
