@@ -12,9 +12,14 @@ public with sharing class OrderTrackingController {
         }
 
         Order__c orderRecord = [
-            SELECT Id, Name, Customer_Name__c, Order_Date__c,
-                   Status__c, Total_Amount__c
-            FROM Order__c
+            SELECT Id,
+       Name,
+       Customer_Name__c,
+       Customer_Email__c,
+       Order_Date__c,
+       Status__c,
+       Total_Amount__c
+FROM Order__c
             WHERE Id = :orderId
             LIMIT 1
         ];

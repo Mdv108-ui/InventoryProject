@@ -8,6 +8,13 @@
                 onchange={handleNameChange}
                 required>
             </lightning-input>
+            <lightning-input
+    type="email"
+    label="Customer Email"
+    value={customerEmail}
+    onchange={handleEmailChange}
+    required>
+</lightning-input>
 
             <template if:true={hasItems}>
                 <div class="slds-m-top_medium">

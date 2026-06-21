@@ -1,13 +1,5 @@
-/**
- * Controller class for order checkout functionality.
- * Handles order creation, order items, and product inventory management.
- */
 public with sharing class OrderCheckoutController {
 
-    /**
-     * Wrapper class for cart items.
-     * Encapsulates product information for cart operations.
-     */
     public class CartItemWrapper {
         @AuraEnabled public Id id;
         @AuraEnabled public String name;
@@ -15,23 +7,18 @@ public with sharing class OrderCheckoutController {
         @AuraEnabled public Integer cartQuantity;
     }
 
-    /**
-     * Wrapper class for processing cart items.
-     * Encapsulates data needed for order item creation.
-     */
-    
-
-    /**
-     * Creates an order with the given customer and cart items.
-     *
-     * @param customerName the name of the customer placing the order
-     * @param cartJson JSON representation of cart items
-     * @return the Id of the created order
-     */
     @AuraEnabled
-    public static Id createOrder(String customerName, String cartJson) {
+    public static Id createOrder(
+        String customerName,
+        String customerEmail,
+        String cartJson
+    ) {
         if (String.isBlank(customerName)) {
             throw new AuraHandledException('Customer name is required.');
+        }
+
+        if (String.isBlank(customerEmail)) {
+            throw new AuraHandledException('Customer email is required.');
         }
 
         List<CartItemWrapper> cartItems = parseCartItems(cartJson);
@@ -42,7 +29,7 @@ public with sharing class OrderCheckoutController {
 
         try {
             Decimal grandTotal = calculateGrandTotal(cartItems);
-            Order__c orderRecord = insertOrder(customerName, grandTotal);
+            Order__c orderRecord = insertOrder(customerName, customerEmail, grandTotal);
             Map<Id, Product__c> productMap = getProductMap(cartItems);
 
             List<Order_Item__c> orderItems = new List<Order_Item__c>();
@@ -50,15 +37,16 @@ public with sharing class OrderCheckoutController {
 
             processCartItems(cartItems, orderRecord.Id, productMap, orderItems, productsToUpdate);
 
-           if (!orderItems.isEmpty()) {
-    insert orderItems;
-}
+            if (!orderItems.isEmpty()) {
+                insert orderItems;
+            }
 
-if (!productsToUpdate.isEmpty()) {
-    update productsToUpdate;
-}
+            if (!productsToUpdate.isEmpty()) {
+                update productsToUpdate;
+            }
 
             return orderRecord.Id;
+
         } catch (Exception e) {
             Database.rollback(sp);
             throw new AuraHandledException(e.getMessage());
@@ -66,7 +54,8 @@ if (!productsToUpdate.isEmpty()) {
     }
 
     private static List<CartItemWrapper> parseCartItems(String cartJson) {
-        List<CartItemWrapper> cartItems = (List<CartItemWrapper>) JSON.deserialize(cartJson, List<CartItemWrapper>.class);
+        List<CartItemWrapper> cartItems =
+            (List<CartItemWrapper>) JSON.deserialize(cartJson, List<CartItemWrapper>.class);
 
         if (cartItems == null || cartItems.isEmpty()) {
             throw new AuraHandledException('Cart is empty.');
@@ -77,6 +66,10 @@ if (!productsToUpdate.isEmpty()) {
 
     private static void validateCartItems(List<CartItemWrapper> cartItems) {
         for (CartItemWrapper item : cartItems) {
+            if (item.id == null) {
+                throw new AuraHandledException('Product Id is missing.');
+            }
+
             if (item.cartQuantity == null || item.cartQuantity <= 0) {
                 throw new AuraHandledException('Invalid quantity for product: ' + item.name);
             }
@@ -111,9 +104,14 @@ if (!productsToUpdate.isEmpty()) {
         return grandTotal;
     }
 
-    private static Order__c insertOrder(String customerName, Decimal grandTotal) {
+    private static Order__c insertOrder(
+        String customerName,
+        String customerEmail,
+        Decimal grandTotal
+    ) {
         Order__c orderRecord = new Order__c(
             Customer_Name__c = customerName,
+            Customer_Email__c = customerEmail,
             Order_Date__c = Date.today(),
             Status__c = 'Confirmed',
             Total_Amount__c = grandTotal
@@ -124,14 +122,12 @@ if (!productsToUpdate.isEmpty()) {
     }
 
     private static Map<Id, Product__c> getProductMap(List<CartItemWrapper> cartItems) {
-        return new Map<Id, Product__c>(
-            [
-                SELECT Id, Quantity__c
-                FROM Product__c
-                WHERE Id IN :getProductIds(cartItems)
-                FOR UPDATE
-            ]
-        );
+        return new Map<Id, Product__c>([
+            SELECT Id, Quantity__c
+            FROM Product__c
+            WHERE Id IN :getProductIds(cartItems)
+            FOR UPDATE
+        ]);
     }
 
     private static void processCartItems(

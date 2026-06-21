@@ -7,7 +7,7 @@ export default class OrderCheckout extends LightningElement {
 
     customerName = '';
     grandTotal = 0;
-
+customerEmail = '';
     @api
     setCheckoutData(cartItems, grandTotal) {
         this.cartItems = cartItems || [];
@@ -21,12 +21,23 @@ export default class OrderCheckout extends LightningElement {
     handleNameChange(event) {
         this.customerName = event.target.value;
     }
+    handleEmailChange(event) {
+    this.customerEmail = event.target.value;
+}
 
     handleConfirmOrder() {
         if (!this.customerName) {
             this.showToast('Error', 'Please enter customer name.', 'error');
             return;
         }
+        if (!this.customerEmail) {
+    this.showToast(
+        'Error',
+        'Please enter customer email.',
+        'error'
+    );
+    return;
+}
 
         if (!this.cartItems || this.cartItems.length === 0) {
             this.showToast('Error', 'Cart is empty.', 'error');
@@ -41,9 +52,10 @@ export default class OrderCheckout extends LightningElement {
         }));
 
         createOrder({
-            customerName: this.customerName,
-            cartJson: JSON.stringify(cartPayload)
-        })
+    customerName: this.customerName,
+    customerEmail: this.customerEmail,
+    cartJson: JSON.stringify(cartPayload)
+})
             .then(orderId => {
                 this.showToast(
                     'Success',
