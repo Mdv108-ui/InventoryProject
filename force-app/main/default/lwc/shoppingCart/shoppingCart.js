@@ -14,7 +14,11 @@ export default class ShoppingCart extends LightningElement {
             this.cartItems = this.cartItems.map(item => {
                 if (item.productId === product.productId) {
                     if (item.quantity >= item.availableQty) {
-                        this.showToast('Stock Limit', 'Cannot add more than available quantity.', 'warning');
+                        this.showToast(
+                            'Stock Limit',
+                            'Cannot add more than available quantity.',
+                            'warning'
+                        );
                         return item;
                     }
 
@@ -26,7 +30,6 @@ export default class ShoppingCart extends LightningElement {
                         subtotal: newQuantity * item.price
                     };
                 }
-
                 return item;
             });
         } else {
@@ -36,6 +39,7 @@ export default class ShoppingCart extends LightningElement {
                     productId: product.productId,
                     productName: product.productName,
                     productCode: product.productCode,
+                    category: product.category,
                     price: product.price || 0,
                     availableQty: product.availableQty || 0,
                     quantity: 1,
@@ -43,6 +47,8 @@ export default class ShoppingCart extends LightningElement {
                 }
             ];
         }
+
+        this.notifyCheckout();
     }
 
     handleQuantityChange(event) {
@@ -57,7 +63,11 @@ export default class ShoppingCart extends LightningElement {
 
                 if (enteredQuantity > item.availableQty) {
                     enteredQuantity = item.availableQty;
-                    this.showToast('Stock Limit', 'Quantity cannot exceed available stock.', 'warning');
+                    this.showToast(
+                        'Stock Limit',
+                        'Quantity cannot exceed available stock.',
+                        'warning'
+                    );
                 }
 
                 return {
@@ -69,6 +79,8 @@ export default class ShoppingCart extends LightningElement {
 
             return item;
         });
+
+        this.notifyCheckout();
     }
 
     handleRemove(event) {
@@ -77,19 +89,15 @@ export default class ShoppingCart extends LightningElement {
         this.cartItems = this.cartItems.filter(
             item => item.productId !== productId
         );
-    }
 
-    get hasItems() {
-        return this.cartItems.length > 0;
-    }
-
-    get grandTotal() {
-        return this.cartItems.reduce((total, item) => {
-            return total + item.subtotal;
-        }, 0);
+        this.notifyCheckout();
     }
 
     handleCheckout() {
+        this.notifyCheckout();
+    }
+
+    notifyCheckout() {
         this.dispatchEvent(
             new CustomEvent('checkout', {
                 detail: {
@@ -97,6 +105,17 @@ export default class ShoppingCart extends LightningElement {
                     grandTotal: this.grandTotal
                 }
             })
+        );
+    }
+
+    get hasItems() {
+        return this.cartItems.length > 0;
+    }
+
+    get grandTotal() {
+        return this.cartItems.reduce(
+            (total, item) => total + item.subtotal,
+            0
         );
     }
 

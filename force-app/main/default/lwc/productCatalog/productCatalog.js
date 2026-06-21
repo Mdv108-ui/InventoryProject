@@ -9,13 +9,10 @@ export default class ProductCatalog extends LightningElement {
     @wire(getActiveProducts)
     wiredProducts({ data, error }) {
         if (data) {
-            this.products = data.map(product => {
-                return {
-                    ...product,
-                    isOutOfStock: !product.Quantity__c || product.Quantity__c <= 0
-                };
-            });
-
+            this.products = data.map(product => ({
+                ...product,
+                isOutOfStock: !product.Quantity__c || product.Quantity__c <= 0
+            }));
             this.error = undefined;
         } else if (error) {
             this.error = error;
@@ -30,14 +27,11 @@ export default class ProductCatalog extends LightningElement {
             product => product.Id === productId
         );
 
-        if (!selectedProduct) {
-            return;
-        }
-
         const cartProduct = {
             productId: selectedProduct.Id,
             productName: selectedProduct.Name,
             productCode: selectedProduct.Product_Code__c,
+            category: selectedProduct.Category__c,
             price: selectedProduct.Price__c,
             availableQty: selectedProduct.Quantity__c,
             quantity: 1,

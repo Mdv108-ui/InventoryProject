@@ -12,13 +12,10 @@ export default class OrderCheckout extends LightningElement {
     setCheckoutData(cartItems, grandTotal) {
         this.cartItems = cartItems || [];
         this.grandTotal = grandTotal || 0;
-
-        console.log('Checkout Items => ', JSON.stringify(this.cartItems));
-        console.log('Grand Total => ', this.grandTotal);
     }
 
     get hasItems() {
-        return this.cartItems && this.cartItems.length > 0;
+        return this.cartItems.length > 0;
     }
 
     handleNameChange(event) {
@@ -36,16 +33,12 @@ export default class OrderCheckout extends LightningElement {
             return;
         }
 
-        const cartPayload = this.cartItems.map(item => {
-            return {
-                id: item.productId,
-                name: item.productName,
-                price: item.price,
-                cartQuantity: item.quantity
-            };
-        });
-
-        console.log('Cart Payload => ', JSON.stringify(cartPayload));
+        const cartPayload = this.cartItems.map(item => ({
+            id: item.productId,
+            name: item.productName,
+            price: item.price,
+            cartQuantity: item.quantity
+        }));
 
         createOrder({
             customerName: this.customerName,
@@ -69,8 +62,6 @@ export default class OrderCheckout extends LightningElement {
                 this.customerName = '';
             })
             .catch(error => {
-                console.error('Order Error => ', JSON.stringify(error));
-
                 this.showToast(
                     'Error',
                     error?.body?.message || 'Order creation failed.',

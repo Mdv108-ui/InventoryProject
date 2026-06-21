@@ -1,34 +1,37 @@
 <template>
     <lightning-card title="Shopping Cart">
         <div class="slds-p-around_medium">
+
             <template if:true={hasItems}>
                 <template for:each={cartItems} for:item="item">
-                    <div key={item.Id} class="slds-box slds-m-bottom_small">
-                        <h2 class="slds-text-heading_small">{item.Name}</h2>
+                    <div key={item.productId} class="slds-box slds-m-bottom_small">
 
-                        <p><strong>Code:</strong> {item.Product_Code__c}</p>
-                        <p><strong>Category:</strong> {item.Category__c}</p>
-                        <p><strong>Price:</strong> ₹{item.Price__c}</p>
-                        <p><strong>Available Qty:</strong> {item.Quantity__c}</p>
+                        <h2 class="slds-text-heading_small">{item.productName}</h2>
+
+                        <p><strong>Code:</strong> {item.productCode}</p>
+                        <p><strong>Category:</strong> {item.category}</p>
+                        <p><strong>Price:</strong> ₹{item.price}</p>
+                        <p><strong>Available Qty:</strong> {item.availableQty}</p>
 
                         <lightning-input
                             type="number"
                             label="Cart Quantity"
-                            value={item.cartQuantity}
+                            value={item.quantity}
                             min="1"
-                            max={item.Quantity__c}
-                            data-id={item.Id}
+                            max={item.availableQty}
+                            data-id={item.productId}
                             onchange={handleQuantityChange}>
                         </lightning-input>
 
-                        <p><strong>Item Total:</strong> ₹{item.totalPrice}</p>
+                        <p><strong>Item Total:</strong> ₹{item.subtotal}</p>
 
                         <lightning-button
                             label="Remove"
                             variant="destructive"
-                            data-id={item.Id}
+                            data-id={item.productId}
                             onclick={handleRemove}>
                         </lightning-button>
+
                     </div>
                 </template>
 
@@ -47,7 +50,7 @@
             <template if:false={hasItems}>
                 <p>Your cart is empty.</p>
             </template>
+
         </div>
-        
     </lightning-card>
 </template>
